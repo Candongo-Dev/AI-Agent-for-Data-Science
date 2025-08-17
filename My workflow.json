@@ -1,0 +1,177 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        -48
+      ],
+      "id": "f685abd1-959a-428e-b4a6-17fc7e0d11fd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wCo8tuiUr_XcrLy9y9n89D6Vtbya5f7Ky82u_8RHtA4",
+          "mode": "list",
+          "cachedResultName": "abtest_airbnb",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wCo8tuiUr_XcrLy9y9n89D6Vtbya5f7Ky82u_8RHtA4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1620550165,
+          "mode": "list",
+          "cachedResultName": "abtest_airbnb",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wCo8tuiUr_XcrLy9y9n89D6Vtbya5f7Ky82u_8RHtA4/edit#gid=1620550165"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1040,
+        -48
+      ],
+      "id": "e044dbb0-79f5-4a32-bc18-07b35581b6af",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qb5XsCyh0gkcSI1P",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tenho um conjunto de dados de um experimento A/B com o seguinte formato:\n\nCelula: Grupo experimental, onde control = control, test_1 = teste 1, test_2 = teste 2\npageviews: número de pageviews geradas por célula\nclicks: número de cliques por celula\nreservas_online: número de reservas online — esta é minha output metric, a métrica de sucesso do teste ab\n\nAbaixo um exemplo de linha da tabela:\n\nQuero que você:\n\nMe diga qual célula teve o melhor desempenho baseado no campo reservas_online.\n\nQual foi o lift da célula vencedora em relação às demais baseado no campo reservas_online\n\nCalcule a taxa de conversão (reservas_online / pageviews) para cada grupo (Celula).\n\nFaça um teste estatístico de diferença de proporções com 95% de confiança entre os grupos. Me diga se a diferença entre os testes e o controle é estatisticamente significativa.\n\nMe diga qual célula deve ser escolhida como vencedora e por quê, com base em estatística e clareza.\n\nMe explique tudo isso de forma clara, simples e com justificativa estatística, como se estivesse explicando para um público de não especialistas. Esta mensagem vai para o time de marketing, por isso crie uma mensagem direta e objetiva\n\nAqui estão os dados em formato JSON (ou tabela) para você analisar:\n\n {{ $json.celula }}, {{ $json.pageviews }}, {{ $json.clicks }}, {{ $json.reservas_online }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -848,
+        -48
+      ],
+      "id": "d2387774-ce40-43be-8c9e-9f9639d8e817",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        224
+      ],
+      "id": "117039e6-6716-40bf-a3b1-e49b25a43d5e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BpYsuX66kcWlmCJq",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ps3helcio@gmail.com",
+        "subject": "Resultado do teste A/B",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -48
+      ],
+      "id": "7aff8a45-88b2-4503-9a7d-ac15515872f8",
+      "name": "Send a message",
+      "webhookId": "49192de4-a73b-4d78-84b2-acbe94b3137a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OOzLfz1B12gqSMyi",
+          "name": "Gmail account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "506e00b1-1488-4ac7-8911-603f8bc7df6a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4ba8de51d78df012fb641adb42271952e86615e99e48a0d7b83e98fbe5d00c48"
+  },
+  "id": "XfjtkgZgQiFbhZcM",
+  "tags": []
+}
