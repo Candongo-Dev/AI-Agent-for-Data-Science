@@ -1,0 +1,33 @@
+Prompt: A/B Test Analysis for Marketing Team
+
+I have an A/B experiment dataset with the following fields:
+
+Cell: Experimental group (control, test_1, test_2)
+
+pageviews: Number of pageviews per group
+
+clicks: Number of clicks per group
+
+online_reservations: Number of online reservations (our success metric)
+
+Here’s what I need you to do:
+
+Identify the best-performing cell based on the online_reservations metric.
+
+Calculate the lift of the winning cell compared to the others.
+
+Compute the conversion rate for each group: online_reservations / pageviews.
+
+Run a statistical test (difference in proportions, 95% confidence) to determine if the test groups differ significantly from the control.
+
+Recommend the winning cell, with clear reasoning based on statistical evidence.
+
+Explain everything simply and clearly, as if presenting to a non-technical marketing team. Keep it direct, objective, and easy to understand.
+
+
+dataset in JSON format:
+[
+  { "cell": "control", "pageviews": ..., "clicks": ..., "online_reservations": ... },
+  { "cell": "test_1", "pageviews": ..., "clicks": ..., "online_reservations": ... },
+  { "cell": "test_2", "pageviews": ..., "clicks": ..., "online_reservations": ... }
+]
